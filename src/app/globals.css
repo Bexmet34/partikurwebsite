@@ -89,6 +89,10 @@ button {
   border-bottom: 1px solid var(--border-color);
 }
 
+.nav-link:hover {
+  color: var(--accent-color) !important;
+}
+
 .navbar-brand {
   display: flex;
   align-items: center;

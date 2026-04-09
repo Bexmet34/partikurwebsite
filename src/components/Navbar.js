@@ -12,9 +12,14 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link href="/" className="navbar-brand text-logo">
-        Veyronix
-      </Link>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+        <Link href="/" className="navbar-brand text-logo">
+          Veyronix
+        </Link>
+        <Link href="/wiki" style={{ color: 'var(--text-muted)', fontWeight: '600', transition: '0.2s' }} className="nav-link">
+          Wiki
+        </Link>
+      </div>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <button onClick={toggleLanguage} className="signout-btn" style={{ padding: '0.4rem 0.8rem', display: 'flex', gap: '0.5rem', alignItems: 'center', borderRadius: '8px' }}>

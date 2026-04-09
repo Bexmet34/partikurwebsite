@@ -1,0 +1,130 @@
+.wikiContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  min-height: 80vh;
+}
+
+.wikiHeader {
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.headerGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background: var(--accent-color);
+  filter: blur(80px);
+  opacity: 0.1;
+  z-index: -1;
+}
+
+.wikiHeader h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.wikiHeader p {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+
+.wikiLayout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.sidebar {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: sticky;
+  top: 100px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  color: var(--text-muted);
+  text-align: left;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  transform: translateX(5px);
+}
+
+.navItem.active {
+  background: var(--accent-color);
+  color: var(--bg-color);
+  font-weight: 600;
+}
+
+.chevron {
+  margin-left: auto;
+  opacity: 0.5;
+}
+
+.active .chevron {
+  opacity: 1;
+}
+
+.content {
+  min-height: 600px;
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.contentTitle {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.contentText {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+
+.placeholderNote {
+  margin-top: 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .wikiLayout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+  }
+  .wikiHeader h1 {
+    font-size: 2.5rem;
+  }
+}

@@ -58,6 +58,17 @@ const en = {
   dashPassive: "(Passive)",
   dashUnknown: "Unknown Server",
   dashManageBtn: "Manage",
+
+  // Footer
+  footerDesc: "The most advanced party management bot for Albion Online guilds.",
+  footerResources: "Resources",
+  footerLegal: "Legal",
+  footerSocial: "Social",
+  wiki: "Wiki",
+  commands: "Commands",
+  privacy: "Privacy Policy",
+  terms: "Terms of Service",
+  allRights: "All rights reserved.",
 };
 
 const tr = {
@@ -111,6 +122,17 @@ const tr = {
   dashPassive: "(Pasif)",
   dashUnknown: "Bilinmeyen Sunucu",
   dashManageBtn: "Yönet",
+
+  // Footer
+  footerDesc: "Albion Online loncaları için en gelişmiş parti yönetim botu.",
+  footerResources: "Kaynaklar",
+  footerLegal: "Yasal",
+  footerSocial: "Sosyal",
+  wiki: "Wiki",
+  commands: "Komutlar",
+  privacy: "Gizlilik Politikası",
+  terms: "Kullanım Koşulları",
+  allRights: "Tüm hakları saklıdır.",
 };
 
 const LanguageContext = createContext();
