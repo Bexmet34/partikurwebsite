@@ -290,7 +290,7 @@ export default function ServerSettings() {
                     onClick={() => setActiveTab("embed")}
                     type="button"
                   >
-                    <ImageIcon size={18}/> {lang === "en" ? "Discord Visuals" : "Discord Görünümleri"}
+                    <ImageIcon size={18}/> {lang === "en" ? "Discord Visuals" : "Embed Resmi"}
                   </button>
                   <button 
                     className={`tab ${activeTab === "whitelist" ? "active" : ""}`}
