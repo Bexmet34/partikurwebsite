@@ -69,6 +69,7 @@ const en = {
   privacy: "Privacy Policy",
   terms: "Terms of Service",
   allRights: "All rights reserved.",
+  changelog: "Changelog",
 };
 
 const tr = {
@@ -133,6 +134,7 @@ const tr = {
   privacy: "Gizlilik Politikası",
   terms: "Kullanım Koşulları",
   allRights: "Tüm hakları saklıdır.",
+  changelog: "Güncelleme Notları",
 };
 
 const LanguageContext = createContext();

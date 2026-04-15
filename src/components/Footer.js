@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
-import { Globe, MessageCircle, Book, Shield, FileText, LayoutDashboard, Code } from "lucide-react";
+import { Globe, MessageCircle, Book, Shield, FileText, LayoutDashboard, Code, History } from "lucide-react";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -45,6 +45,11 @@ export default function Footer() {
                 <LayoutDashboard size={18} /> {t.dashboard}
               </Link>
             </li>
+            <li>
+              <Link href="/changelog" style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="hover-accent">
+                <History size={18} /> {t.changelog}
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -84,6 +89,7 @@ export default function Footer() {
         <div style={{ display: 'flex', gap: '1.5rem' }}>
           <Link href="/" className="hover-accent">Home</Link>
           <Link href="/wiki" className="hover-accent">Wiki</Link>
+          <Link href="/changelog" className="hover-accent">{t.changelog}</Link>
           <a href="https://top.gg/bot/1082239904169336902" target="_blank" rel="noopener noreferrer" className="hover-accent">Top.gg</a>
         </div>
       </div>
