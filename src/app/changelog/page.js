@@ -21,7 +21,7 @@ export default function ChangelogPage() {
       const { data, error } = await supabase
         .from("changelogs")
         .select("*")
-        .order("date", { ascending: false });
+        .order("created_at", { ascending: false });
       
       if (data) {
         setLogs(data);
