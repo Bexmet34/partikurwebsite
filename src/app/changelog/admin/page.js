@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Save, ArrowLeft, PlusCircle, Trash2, Eye } from "lucide-react";
+import { Save, ArrowLeft, PlusCircle, Trash2, Eye, Languages, Sparkles, Loader2 } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -16,6 +16,7 @@ export default function ChangelogAdmin() {
   const router = useRouter();
   
   const [loading, setLoading] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const [logs, setLogs] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,10 +25,11 @@ export default function ChangelogAdmin() {
     title_tr: "",
     title_en: "",
     content_tr: "",
-    content_en: ""
+    content_en: "",
+    _previewLang: "tr"
   });
 
-  const ADMIN_ID = "407234961582587916";
+  const ADMIN_ID = process.env.NEXT_PUBLIC_ADMIN_ID || "407234961582587916";
 
   useEffect(() => {
     if (status === "loading") return;
@@ -53,40 +55,106 @@ export default function ChangelogAdmin() {
       .select("*")
       .order("created_at", { ascending: false });
     
+    if (error) {
+      console.error("Supabase fetch error:", error.message || error);
+      return;
+    }
+
     if (data) {
       setLogs(data);
       // Auto-calculate next version
       if (data.length > 0) {
-        const lastVer = data[0].version;
+        const lastVer = data[0].version; // Expecting "1.0.0"
         const parts = lastVer.replace("v", "").split(".").map(Number);
         if (parts.length === 3) {
           parts[2] += 1;
-          setFormData(prev => ({ ...prev, version: `v${parts.join(".")}` }));
+          setFormData(prev => ({ ...prev, version: parts.join(".") }));
         }
       } else {
-        setFormData(prev => ({ ...prev, version: "v1.0.0" }));
+        setFormData(prev => ({ ...prev, version: "1.0.0" }));
       }
     }
   }
 
   const handleTrTitleChange = (val) => {
-    setFormData(prev => ({ ...prev, title_tr: val, title_en: prev.title_en === prev.title_tr ? val : prev.title_en }));
+    setFormData(prev => ({ 
+      ...prev, 
+      title_tr: val, 
+      title_en: (prev.title_en === "" || prev.title_en === prev.title_tr) ? val : prev.title_en 
+    }));
   };
 
   const handleTrContentChange = (val) => {
-    setFormData(prev => ({ ...prev, content_tr: val, content_en: prev.content_en === prev.content_tr ? val : prev.content_en }));
+    setFormData(prev => ({ 
+      ...prev, 
+      content_tr: val, 
+      content_en: (prev.content_en === "" || prev.content_en === prev.content_tr) ? val : prev.content_en 
+    }));
   };
+
+  async function translateFields() {
+    if (!formData.title_tr && !formData.content_tr) {
+      alert("Önce Türkçe kısımları doldurmalısınız!");
+      return;
+    }
+
+    setTranslating(true);
+    try {
+      // Translate Title
+      let translatedTitle = formData.title_en;
+      if (formData.title_tr) {
+        const resTitle = await fetch('/api/translate', {
+          method: 'POST',
+          body: JSON.stringify({ text: formData.title_tr })
+        });
+        const dataTitle = await resTitle.json();
+        translatedTitle = dataTitle.translatedText;
+      }
+
+      // Translate Content
+      let translatedContent = formData.content_en;
+      if (formData.content_tr) {
+        const resContent = await fetch('/api/translate', {
+          method: 'POST',
+          body: JSON.stringify({ text: formData.content_tr })
+        });
+        const dataContent = await resContent.json();
+        translatedContent = dataContent.translatedText;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        title_en: translatedTitle,
+        content_en: translatedContent
+      }));
+    } catch (error) {
+      console.error("Translation fail:", error);
+      alert("Çeviri sırasında bir hata oluştu.");
+    } finally {
+      setTranslating(false);
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
 
+    const payload = {
+      version: formData.version.replace("v", ""),
+      date: formData.date,
+      title_tr: formData.title_tr,
+      title_en: formData.title_en,
+      content_tr: formData.content_tr,
+      content_en: formData.content_en
+    };
+
     const { error } = await supabase
       .from("changelogs")
-      .insert([formData]);
+      .insert([payload]);
 
     if (error) {
-      alert("Hata: " + error.message);
+      console.error("Supabase insert error:", error.message || error);
+      alert("Hata: " + (error.message || "Bilinmeyen bir hata oluştu."));
     } else {
       alert("Başarıyla kaydedildi!");
       const nextVer = formData.version; // This will be updated after fetchLogs
@@ -96,7 +164,8 @@ export default function ChangelogAdmin() {
         title_tr: "",
         title_en: "",
         content_tr: "",
-        content_en: ""
+        content_en: "",
+        _previewLang: "tr"
       });
       fetchLogs();
     }
@@ -121,6 +190,24 @@ export default function ChangelogAdmin() {
           <h1 style={{ fontSize: "2.5rem", fontWeight: "800" }}>🚀 Güncelleme Yayınla</h1>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <button 
+              onClick={translateFields}
+              disabled={translating}
+              className="glass-panel" 
+              style={{ 
+                padding: '0.5rem 1rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                cursor: 'pointer', 
+                color: 'var(--accent-color)',
+                borderColor: 'var(--accent-color)',
+                opacity: translating ? 0.6 : 1
+              }}
+            >
+              {translating ? <Loader2 size={18} className="animate-spin" /> : <Languages size={18} />}
+              {translating ? "Çevriliyor..." : "Tercüme Et (EN)"}
+            </button>
+            <button 
               onClick={() => setShowPreview(!showPreview)} 
               className="glass-panel" 
               style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', border: showPreview ? '1px solid var(--accent-color)' : '1px solid var(--border-color)' }}
@@ -136,16 +223,26 @@ export default function ChangelogAdmin() {
         <div style={{ display: "grid", gridTemplateColumns: showPreview ? "1fr" : "1.2fr 0.8fr", gap: "2.5rem" }}>
           {showPreview ? (
             <div className="glass-panel animate-fade-in" style={{ padding: "3rem", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "1.5rem" }}>
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <button 
+                  onClick={() => setFormData(p => ({...p, _previewLang: 'tr'}))}
+                  style={{ padding: '0.4rem 1rem', borderRadius: '20px', border: '1px solid var(--border-color)', background: (formData._previewLang || 'tr') === 'tr' ? 'var(--accent-color)' : 'transparent', color: (formData._previewLang || 'tr') === 'tr' ? 'black' : 'white', cursor: 'pointer', fontWeight: 'bold' }}
+                >TR Preview</button>
+                <button 
+                  onClick={() => setFormData(p => ({...p, _previewLang: 'en'}))}
+                  style={{ padding: '0.4rem 1rem', borderRadius: '20px', border: '1px solid var(--border-color)', background: (formData._previewLang || 'tr') === 'en' ? 'var(--accent-color)' : 'transparent', color: (formData._previewLang || 'tr') === 'en' ? 'black' : 'white', cursor: 'pointer', fontWeight: 'bold' }}
+                >EN Preview</button>
+              </div>
               <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                 <span style={{ background: "var(--accent-color)", color: "var(--bg-color)", padding: "0.3rem 0.8rem", borderRadius: "8px", fontSize: "0.9rem", fontWeight: "bold" }}>
                   {formData.version}
                 </span>
                 <span style={{ color: "var(--text-muted)", fontSize: "0.95rem" }}>{formData.date}</span>
               </div>
-              <h2 style={{ fontSize: "2rem", fontWeight: "800", color: "white" }}>{formData.title_tr || "Başlık"}</h2>
+              <h2 style={{ fontSize: "2rem", fontWeight: "800", color: "white" }}>{(formData._previewLang === 'en' ? formData.title_en : formData.title_tr) || "Başlık"}</h2>
               <div className="markdown-content" style={{ width: "100%", maxWidth: "800px", color: "var(--text-muted)", lineHeight: "1.8", fontSize: "1.1rem" }}>
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {formData.content_tr || "*İçerik buraya gelecek...*"}
+                  {(formData._previewLang === 'en' ? formData.content_en : formData.content_tr) || "*İçerik buraya gelecek...*"}
                 </ReactMarkdown>
               </div>
             </div>
